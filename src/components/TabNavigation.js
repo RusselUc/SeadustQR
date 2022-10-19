@@ -31,7 +31,7 @@ function Books(){
   }
 
 const TabArr = [
-    {route:'Home', label: 'Incio', component:Home, icon:'home', color: Colors.primary, alphaClr: Colors.primaryAlpha},
+    {route:'Home', label: 'Inicio', component:Home, icon:'home', color: Colors.primary, alphaClr: Colors.primaryAlpha},
     {route:'ScreenList', label: 'Lista', component:ScreenList, icon:'th-list', color: Colors.turquesa, alphaClr: Colors.turquesaAlpha},
     {route:'ScreenSuccess', label: 'Entregados', component:ScreenSuccess, icon:'check', color: Colors.green, alphaClr: Colors.greenAlpha},
     {route:'Profile', label: 'Perfil', component:Profile, icon:'user', color: Colors.blue, alphaClr: Colors.blueAlpha},

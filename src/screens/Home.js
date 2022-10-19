@@ -8,7 +8,7 @@ export default function Home() {
 
             <StatusBar
                 backgroundColor="#c2b5ea"
-                // translucent={true}
+                translucent={false}
                 />
 
             <Text>Home</Text>

@@ -1,4 +1,4 @@
-import { View, Text, Dimensions, TouchableOpacity } from 'react-native'
+import { View, Text, Dimensions, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
 import Background from '../components/Background'
 import Colors from '../constants/Colors'
@@ -10,7 +10,7 @@ export default function Login(props) {
     return (
         <Background>
             <View style={{ alignItems: 'center', width: width, height:'100%'}}>
-                <Text style={{ color: 'white', fontSize: 64, fontWeight: 'bold', marginVertical: 20 }}>
+                <Text style={{ color: 'white', fontSize: 64, fontWeight: 'bold', marginVertical: 10 }}>
                     Login
                 </Text>
                 <View style={
@@ -25,6 +25,9 @@ export default function Login(props) {
                         padding: 50
                     }
                 }>
+
+                    <Image source={require('../assets/image/logoSeadust.png')} style={{width:200, height:100, resizeMode:'center'}}/>
+
                     <Text style={
                         {
                             fontSize: 40,
