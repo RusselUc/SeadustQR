@@ -52,5 +52,7 @@ export default {
     bag11Bg: '#c7d3c0',
 
 
-    bgSuave:'#e3d3f3'
+    bgSuave:'#e3d3f3',
+    doradoSeadust:'#cbb387',
+    azulSeadust:'#0070b4'
 }

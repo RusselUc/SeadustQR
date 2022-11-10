@@ -1,0 +1,13 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/Fuente.otf",
+      "sha1": "74104caff4f8e01387db2c1d95e828f0cec0c74f"
+    },
+    {
+      "path": "src/assets/fonts/MyriadPro-Condensed.woff2",
+      "sha1": "fff5aac241f5a26d074be8c95871c0a72731551b"
+    }
+  ]
+}

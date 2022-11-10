@@ -1,24 +1,51 @@
-import { View, Text, Dimensions, Image, StatusBar } from 'react-native'
-import React from 'react'
+import { View, Text, Dimensions, Image, StatusBar, TouchableOpacity } from 'react-native'
+import React, {useContext} from 'react'
 import Background from '../components/Background'
 import Button from '../components/Button'
 import Colors from '../constants/Colors'
+import { GoogleSignin, GoogleSigninButton } from '@react-native-google-signin/google-signin';
+import auth from '@react-native-firebase/auth';
+import { AuthContext } from '../context/AuthProvider'
+
+
 
 export default function ScreenLog(props) {
   const { heigth, width } = Dimensions.get('window')
+  const {googleSignIn, googleSignOut, getCurrentUser, isSignedIn} = useContext(AuthContext)
+
+  const toHome = async () =>{
+    await googleSignIn()
+    props.navigation.navigate('LayoutHome')
+  }
   return (
     <Background>
-      <View style={{marginHorizontal:30, marginTop: '100%'}}>
-        <View style={{backgroundColor:Colors.lightOverlayColor, borderRadius:20, alignItems:'center'}}>
-          <Image source={require('../assets/image/logoSeadust.png')} style={{width:300, height:200, resizeMode:'center'}}/>
+      <View style={{ marginHorizontal: width/8, marginTop: '100%', alignItems:'center'}}>
+        <View style={{ borderRadius: 20, alignItems: 'center' }}>
+          <Image source={require('../assets/image/logoSeadust.png')} style={{ width: 300, height: 200, resizeMode: 'center' }} />
         </View>
-        {/* <View style={{backgroundColor:Colors.blackAlpha, borderRadius:20, alignItems:'center'}}>
-          <Text style={{color:'white', fontSize:64, fontWeight:'bold'}}>Seadust</Text>
-          <Text style={{color:'white', fontSize:30, marginBottom:40, fontWeight:'bold'}}>Cancun Family Resort</Text>
-        </View> */}
 
-        <Button bgColor={Colors.primary} textColor={Colors.white} btnLabel="Login" onPress={() => props.navigation.navigate('Login')}/>
-        <Button bgColor={Colors.white} textColor={Colors.primary} btnLabel="Sign up" onPress={() => props.navigation.navigate('SignUp')}/>
+        <Text style={{fontFamily:'Fuente'}}>
+          <Text style={{color:'white', fontSize:30}}></Text>
+        </Text>
+
+        <View style={{alignItems:'center'}}>
+          <GoogleSigninButton
+            style={{ width: 192, height: 60 }}
+            size={GoogleSigninButton.Size.Wide}
+            color={GoogleSigninButton.Color.Dark}
+            onPress={toHome}
+          />
+
+          {/* <TouchableOpacity onPress={googleSignOut}>
+            <Text>Cerrar Sesión</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={getCurrentUser}>
+            <Text>currentUser</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={isSignedIn}>
+            <Text>isSignedIn</Text>
+          </TouchableOpacity> */}
+        </View>
       </View>
     </Background>
   )

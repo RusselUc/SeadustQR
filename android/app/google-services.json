@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "103574021059",
+    "project_id": "seadust-39dcb",
+    "storage_bucket": "seadust-39dcb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:103574021059:android:e1f1970380d2ef39595376",
+        "android_client_info": {
+          "package_name": "com.seadustqr"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "103574021059-buqiiji1gggpeoticliib20hgiusngi0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.seadustqr",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "103574021059-3f51oscnlqimqp6d2misuo3q81ms9kh8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHHLm8fF5EiUf9eULdht26FGzzyE-7P5E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "103574021059-3f51oscnlqimqp6d2misuo3q81ms9kh8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

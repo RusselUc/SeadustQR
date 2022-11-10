@@ -1,14 +1,17 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import { StyleSheet, TouchableOpacity, View, Text } from "react-native"
+import { StyleSheet, TouchableOpacity, View, Text, Image, Button } from "react-native"
 import Home from "../screens/Home"
 import Profile from "../screens/Profile"
 import ScreenList from "../screens/ScreenList"
 import ScreenPost from "../screens/ScreenPost"
 import ScreenSuccess from "../screens/ScreenSuccess"
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import * as Animatable from 'react-native-animatable';
 import Colors from "../constants/Colors";
+import ModalPoup from "./ModalPoup"
+import { event } from "react-native-reanimated"
+
 
 
 const Tab = createBottomTabNavigator()
@@ -17,6 +20,7 @@ const TabButton = (props) => {
   const {item, onPress, accessibilityState} = props;
   const focused = accessibilityState.selected;
   const viewRef = useRef(null);
+
 
   useEffect(() => {
       if(focused){
@@ -41,7 +45,7 @@ const TabButton = (props) => {
               ref={viewRef}
               duration={500}
           >
-              <Icon name={item.icon} style={styles.icon} color={focused ? item.color: Colors.primaryLite}/>
+              <Icon name={item.icon} style={styles.icon} color={focused ? item.color: Colors.azulSeadust}/>
           </Animatable.View>
       </TouchableOpacity>
   )
@@ -56,19 +60,20 @@ const CustomTabBarButton = ({ children, onPress }) => (
 
     onPress={onPress}
   >
-    <View style={{ width: 70, height: 70, borderRadius: 35, backgroundColor: Colors.red }}>{children}</View>
+    <View style={{ width: 70, height: 70, borderRadius: 35, backgroundColor: Colors.doradoSeadust }}>{children}</View>
   </TouchableOpacity>
 )
 
 const TabArr = [
-  { route: 'Home', label: 'Inicio', component: Home, icon: 'home', color: Colors.primary, alphaClr: Colors.primaryAlpha },
-  { route: 'ScreenList', label: 'Lista', component: ScreenList, icon: 'th-list', color: Colors.turquesa, alphaClr: Colors.turquesaAlpha },
-  { route: 'ScreenPost', label: 'Agregar', component: ScreenPost, icon: 'plus', color: Colors.turquesa, alphaClr: Colors.turquesaAlpha },
-  { route: 'ScreenSuccess', label: 'Entregados', component: ScreenSuccess, icon: 'check', color: Colors.green, alphaClr: Colors.greenAlpha },
-  { route: 'Profile', label: 'Perfil', component: Profile, icon: 'user', color: Colors.blue, alphaClr: Colors.blueAlpha },
+  { route: 'Home', label: 'Inicio', component: Home, icon: 'home', color: Colors.doradoSeadust, alphaClr: Colors.primaryAlpha },
+  { route: 'ScreenList', label: 'Lista', component: ScreenList, icon: 'th-list', color: Colors.doradoSeadust, alphaClr: Colors.turquesaAlpha },
+  { route: 'ScreenPost', label: 'Agregar', component: ScreenPost, icon: 'plus', color: Colors.doradoSeadust, alphaClr: Colors.turquesaAlpha },
+  { route: 'ScreenSuccess', label: 'Entregados', component: ScreenSuccess, icon: 'check', color: Colors.doradoSeadust, alphaClr: Colors.greenAlpha },
+  { route: 'Profile', label: 'Perfil', component: Profile, icon: 'user', color: Colors.doradoSeadust, alphaClr: Colors.blueAlpha },
 ]
 
 export default function Tabs() {
+  const [visible, setVisible] = useState(false);
   return (
     <Tab.Navigator
       screenOptions={
@@ -96,7 +101,9 @@ export default function Tabs() {
           tabBarButton: (props) => <TabButton {...props} item={TabArr[1]} />
         }}
       />
-      <Tab.Screen name="ScreenPost" component={ScreenPost}
+      <Tab.Screen name="ScreenPost"
+        // component={ScreenPost}
+        children={()=><ScreenPost visible={visible} setVisible={setVisible}/>}
         options={{
           tabBarShowLabel: false,
           tabBarIcon: ({ color, size }) => (
@@ -104,6 +111,16 @@ export default function Tabs() {
           ),
           tabBarButton: (props) => (<CustomTabBarButton {...props} />)
         }}
+
+        listeners={({navigation}) => ({
+          tabPress: event => {
+            // event.preventDefault()
+            // navigation.navigate('Home')
+            setVisible(true)
+            // console.log("clic");
+            // navigation.navigate('LayoutHome')
+          }
+        })}
       />
       <Tab.Screen name="ScreenSuccess" component={ScreenSuccess}
         options={{
@@ -118,82 +135,7 @@ export default function Tabs() {
         }}
       />
 
-      {/* {
-        TabArr.map((item, index) => {
-          return (
-            <Tab.Screen key={index} name={item.route} component={item.component}
-              options={
-                {
-                  tabBarShowLabel: false,
-                  // tabBarLabel:item.label,
-                  tabBarIcon: ({ color, size }) => (
-                    <Icon name={item.icon} size={size} color={color} />
-                  ),
-                  tabBarButton: (props) => <TabButton {...props} item={item} />
-                }
-              } />
-          )
-        })
-      } */}
     </Tab.Navigator>
-    // <Tab.Navigator
-    //   screenOptions={{
-    //     headerShown: false,
-    //     tabBarStyle: {
-    //       position: 'absolute',
-    //       bottom: 25,
-    //       left: 20,
-    //       right: 20,
-    //       elevation: 0,
-    //       backgrounColor: '#ffffff',
-    //       borderRadius: 15,
-    //       height: 60,
-    //       ...styles.shadow
-    //     }
-    //   }}>
-    //   <Tab.Screen name="Home" component={Home}
-    //     options={{
-    //       tabBarShowLabel:false,
-    //       tabBarIcon: ({ color, size }) => (
-    //         <Icon name='home' size={size} color={color} />
-    //       ),
-    //       tabBarButton: (props) => <TabButton {...props}/>
-    //     }}
-    //   />
-    //   <Tab.Screen name="ScreenList" component={ScreenList}
-    //     options={{
-    //       tabBarShowLabel:false,
-    //       tabBarIcon: ({ color, size }) => (
-    //         <Icon name='th-list' size={size} color={color} />
-    //       )
-    //     }}
-    //   />
-    //   <Tab.Screen name="ScreenPost" component={ScreenPost}
-    //     options={{
-    //       tabBarShowLabel:false,
-    //       tabBarIcon: ({ color, size }) => (
-    //         <Icon name='plus' size={size} color={color} />
-    //       ),
-    //       tabBarButton: (props) => (<CustomTabBarButton {...props}/>)
-    //     }}
-    //   />
-    //   <Tab.Screen name="ScreenSuccess" component={ScreenSuccess}
-    //     options={{
-    //       tabBarShowLabel:false,
-    //       tabBarIcon: ({ color, size }) => (
-    //         <Icon name='check' size={size} color={color} />
-    //       )
-    //     }}
-    //   />
-    //   <Tab.Screen name="Profile" component={Profile}
-    //     options={{
-    //       tabBarShowLabel:false,
-    //       tabBarIcon: ({ color, size }) => (
-    //         <Icon name='user' size={size} color={color} />
-    //       )
-    //     }}
-    //   />
-    // </Tab.Navigator>
   )
 }
 
