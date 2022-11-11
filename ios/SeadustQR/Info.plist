@@ -53,7 +53,9 @@
 	<false/>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Fuente.otf</string>
+		<string>myriadpro-bold.otf</string>
+		<string>myriadpro-light.otf</string>
+		<string>myriadpro-blacksemicn.otf</string>
 	</array>
 </dict>
 </plist>

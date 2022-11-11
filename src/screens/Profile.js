@@ -17,7 +17,7 @@ export default function Profile(props) {
     <View>
 
       <View style={{alignItems:'center', marginVertical:20}}>
-        <Text style={{fontSize:30, color:'black'}}>{user.name}</Text>
+        <Text style={{fontSize:30, color:'black', fontFamily:'myriadpro-blacksemicn'}}>{user.name}</Text>
       </View>
 
       <View style={{alignItems:'center', marginVertical:20}}>

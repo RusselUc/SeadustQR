@@ -27,7 +27,7 @@ const TabButton = (props) => {
           viewRef.current.animate(
               {
                   0:{scale:1, rotate:'0deg'},
-                  1:{scale:1.5, rotate:'360deg'}
+                  1:{scale:1.5, rotate:'0deg'}
               }
               );
       } else {
@@ -45,7 +45,7 @@ const TabButton = (props) => {
               ref={viewRef}
               duration={500}
           >
-              <Icon name={item.icon} style={styles.icon} color={focused ? item.color: Colors.azulSeadust}/>
+              <Icon name={item.icon} style={styles.icon} color={focused ? item.color: Colors.doradoSeadust}/>
           </Animatable.View>
       </TouchableOpacity>
   )
@@ -60,16 +60,16 @@ const CustomTabBarButton = ({ children, onPress }) => (
 
     onPress={onPress}
   >
-    <View style={{ width: 70, height: 70, borderRadius: 35, backgroundColor: Colors.doradoSeadust }}>{children}</View>
+    <View style={{ width: 70, height: 70, borderRadius: 35, backgroundColor: Colors.azulSeadust }}>{children}</View>
   </TouchableOpacity>
 )
 
 const TabArr = [
-  { route: 'Home', label: 'Inicio', component: Home, icon: 'home', color: Colors.doradoSeadust, alphaClr: Colors.primaryAlpha },
-  { route: 'ScreenList', label: 'Lista', component: ScreenList, icon: 'th-list', color: Colors.doradoSeadust, alphaClr: Colors.turquesaAlpha },
-  { route: 'ScreenPost', label: 'Agregar', component: ScreenPost, icon: 'plus', color: Colors.doradoSeadust, alphaClr: Colors.turquesaAlpha },
-  { route: 'ScreenSuccess', label: 'Entregados', component: ScreenSuccess, icon: 'check', color: Colors.doradoSeadust, alphaClr: Colors.greenAlpha },
-  { route: 'Profile', label: 'Perfil', component: Profile, icon: 'user', color: Colors.doradoSeadust, alphaClr: Colors.blueAlpha },
+  { route: 'Home', label: 'Inicio', component: Home, icon: 'home', color: Colors.azulSeadust, alphaClr: Colors.primaryAlpha },
+  { route: 'ScreenList', label: 'Lista', component: ScreenList, icon: 'th-list', color: Colors.azulSeadust, alphaClr: Colors.turquesaAlpha },
+  { route: 'ScreenPost', label: 'Agregar', component: ScreenPost, icon: 'plus', color: Colors.azulSeadust, alphaClr: Colors.turquesaAlpha },
+  { route: 'ScreenSuccess', label: 'Entregados', component: ScreenSuccess, icon: 'check', color: Colors.azulSeadust, alphaClr: Colors.greenAlpha },
+  { route: 'Profile', label: 'Perfil', component: Profile, icon: 'user', color: Colors.azulSeadust, alphaClr: Colors.blueAlpha },
 ]
 
 export default function Tabs() {

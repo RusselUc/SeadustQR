@@ -12,7 +12,8 @@ export default function ScreenList() {
   const loadData = async () => {
     try {
       const productos = await firestore().collection(user.email).get()
-      setData(productos.docs)
+      const arrayData = productos.docs.map(doc => ({id:doc.id, ...doc.data()}))
+      setData(arrayData)
     } catch (error) {
       console.log(error)
     }
@@ -27,6 +28,9 @@ export default function ScreenList() {
 
   return (
     <View style={{padding:10}}>
+      <View style={{alignItems:'center', paddingVertical: 10,}}>
+        <Text style={{fontSize:30, fontFamily:'myriadpro-bold', color:'black'}}>Solicitudes</Text>
+      </View>
       <FlatList
         data={data}
         renderItem = {({item}) => <RenderItem item={item}/>}

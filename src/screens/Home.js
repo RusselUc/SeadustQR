@@ -8,7 +8,7 @@ export default function Home() {
         <SafeAreaView style={{ backgroundColor: '#F5F5F5', height: '100%' }}>
 
             <StatusBar
-                backgroundColor={Colors.doradoSeadust}
+                backgroundColor={Colors.azulSeadust}
                 translucent={false}
             />
             <View style={{flex:1,justifyContent:'center', alignItems:'center'}}>

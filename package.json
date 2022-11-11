@@ -2,7 +2,11 @@
   "name": "SeadustQR",
   "version": "0.0.1",
   "private": true,
-  "rnpm": {"assets":["./src/assets/fonts/"]},
+  "rnpm": {
+    "assets": [
+      "./src/assets/fonts/"
+    ]
+  },
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
@@ -18,6 +22,7 @@
     "@react-navigation/bottom-tabs": "^6.4.0",
     "@react-navigation/native": "^6.0.13",
     "@react-navigation/native-stack": "^6.9.1",
+    "@types/react": "^18.0.25",
     "react": "18.1.0",
     "react-native": "0.70.3",
     "react-native-animatable": "^1.3.3",

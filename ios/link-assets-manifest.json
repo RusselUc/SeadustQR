@@ -2,12 +2,16 @@
   "migIndex": 1,
   "data": [
     {
-      "path": "src/assets/fonts/Fuente.otf",
-      "sha1": "74104caff4f8e01387db2c1d95e828f0cec0c74f"
+      "path": "src/assets/fonts/myriadpro-blacksemicn.otf",
+      "sha1": "af27be61622de67bbd43d606e166ac702723a300"
     },
     {
-      "path": "src/assets/fonts/MyriadPro-Condensed.woff2",
-      "sha1": "fff5aac241f5a26d074be8c95871c0a72731551b"
+      "path": "src/assets/fonts/myriadpro-bold.otf",
+      "sha1": "480e09db95ed144507380ee21156b29e977cef3c"
+    },
+    {
+      "path": "src/assets/fonts/myriadpro-light.otf",
+      "sha1": "28fe03761bcf26c9a693b36aa896fab9e84105ae"
     }
   ]
 }
