@@ -26,16 +26,16 @@ export default function Profile(props) {
 
 
       <View style={{alignItems:'center',}}>
-        <Text style={{fontSize:20, color:'black'}}>{user.email}</Text>
+        <Text style={{fontSize:20, color:'black', fontFamily:'myriadpro-light'}}>{user.email}</Text>
       </View>
 
       <View style={{alignItems:'center', marginVertical:20}}>
-        <Button btnLabel='Cerrar sesión' bgColor={Colors.red} textColor='white' onPress={toLogin}/>
+        <TouchableOpacity style={{backgroundColor:Colors.azulSeadust, borderRadius:8}} onPress={toLogin}>
+          <Text style={{fontSize:30, fontFamily:'myriadpro-bold', color:'white', padding:10}}>Cerrar Sesión</Text>
+        </TouchableOpacity>
+        {/* <Button btnLabel='Cerrar sesión' bgColor={Colors.red} textColor='white' onPress={toLogin}/> */}
       </View>
 
-      <TouchableOpacity onPress={getCurrentUser}>
-            <Text>currentUser</Text>
-      </TouchableOpacity>
     </View>
   )
 }

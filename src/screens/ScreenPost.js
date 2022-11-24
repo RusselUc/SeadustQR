@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -19,12 +19,16 @@ import QRCode from 'react-native-qrcode-svg';
 import QRModal from '../components/QRModal';
 import ModalLayout from '../components/ModalLayout';
 import { AuthContext } from '../context/AuthProvider';
+import CustomInput from '../components/CustomInput';
+import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
+
 
 
 const ModalPoup = ({ visible, children }) => {
   const [showModal, setShowModal] = React.useState(visible);
   const scaleValue = React.useRef(new Animated.Value(0)).current;
-  React.useEffect(() => {
+
+  useEffect(() => {
     toggleModal();
   }, [visible]);
   const toggleModal = () => {
@@ -58,92 +62,228 @@ const ModalPoup = ({ visible, children }) => {
 
 const ScreenPost = ({ visible, setVisible }) => {
 
+  const { user } = useContext(AuthContext)
+
   const [codeProduct, setCodeProduct] = useState("")
+  const [productname, setProductName] = useState("")
   const [description, setDescription] = useState("")
   const [numPiece, setNumPiece] = useState("")
   const [uso, setUso] = useState("")
   const [name, setName] = useState("")
+
   const [isVisible, setisVisible] = useState(false)
   const [product, setProduct] = useState(false)
+  const [folio, setFolio] = useState(0)
+  const [flag, setFlag] = useState(false)
+  const [empty, setEmpty] = useState(false)
+
+  const [products, setProducts] = useState([])
+
+  const [focus, setFocus] = useState(Colors.azulSeadust)
 
   const navigation = useNavigation();
 
-  const {user} = useContext(AuthContext)
 
   const closeModal = () => {
-    navigation.navigate('Home')
+    navigation.navigate('ScreenList')
+    setCodeProduct("")
+    setDescription("")
+    setNumPiece("")
+    setUso("")
+    setProductName("")
+    setProducts([])
+    setFlag(false)
     setVisible(false)
+    setisVisible(false)
+    setEmpty(false)
   }
 
-  const handleCreate = () => {
+  const load = async () => {
+    const suscriber = firestore().collection('Folio')
+      .onSnapshot(querySnapshot => {
+        const folioId = []
+
+        querySnapshot.forEach(document => {
+          folioId.push(
+            {
+              ...document.data()
+            }
+          )
+          setFolio(folioId[0].folioId)
+        })
+      })
+    return () => suscriber()
+  }
+
+
+  const handleCreate = async () => {
     try {
-      firestore().collection(user.email).add({
+      if (!codeProduct.trim()) {
+        console.log("vacio code product")
+        setEmpty(true)
+      } else if (!description.trim()) {
+        console.log("vacio description")
+        setEmpty(true)
+      } else if (!numPiece.trim()) {
+        console.log("vacio numPiece")
+        setEmpty(true)
+      } else if (!uso.trim()) {
+        console.log("vacio uso")
+        setEmpty(true)
+      } else {
+        setEmpty(false)
+        products.push({
+          codeProduct,
+          productname,
+          description,
+          numPiece,
+          uso,
+          folio,
+          name,
+          date: Date.now(),
+          success: false
+        })
+
+        products.forEach((product) => {
+          firestore().collection(user.email).add(product).then((docRef) => {
+            setProduct(docRef.id)
+            setisVisible(true)
+          })
+        })
+      }
+    } catch (error) {
+      alert(error)
+    } finally {
+      update()
+    }
+  }
+
+  const update = () => {
+    try {
+      firestore().collection('Folio').doc('1').update(
+        {
+          folioId: folio + 1
+        }
+      )
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleAddOther = () => {
+    if (!codeProduct.trim()) {
+      console.log("vacio code product")
+      setEmpty(true)
+    } else if(!productname.trim()){
+      setEmpty(true)
+    } else if (!description.trim()) {
+      console.log("vacio description")
+      setEmpty(true)
+    } else if (!numPiece.trim()) {
+      console.log("vacio numPiece")
+      setEmpty(true)
+    } else if (!uso.trim()) {
+      console.log("vacio uso")
+      setEmpty(true)
+    } else if(!name.trim()){
+      setEmpty(true)
+    } else {
+      setEmpty(false)
+      setFlag(true)
+      setProducts([...products, {
         codeProduct,
+        productname,
         description,
         numPiece,
         uso,
+        folio,
         name,
-        date: Date.now()
-      }).then((docRef) => {
-        setProduct(docRef.id)
-        setisVisible(true)
-      })
-    } catch (error) {
-      alert(error)
+        completed:"processing",
+        date: Date.now(),
+        success: false
+      }])
+      setCodeProduct("")
+      setDescription("")
+      setNumPiece("")
+      setUso("")
+      setProductName("")
     }
   }
+
+  useEffect(() => {
+    load()
+  }, [])
+
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', }}>
       <ModalPoup visible={visible}>
         <View style={{ alignItems: 'center' }}>
           <View style={styles.header}>
-            <Text style={{ fontWeight: 'bold', fontSize: 18, color: 'black' }}>Requisición de materiales</Text>
+            <Text style={{ fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(2.3), color: 'black' }}>Requisición de materiales</Text>
+
+            {flag && (
+              <View style={{ borderRadius: 20, margin: 5, backgroundColor: Colors.azulSeadust, height: responsiveHeight(2.2), width: responsiveWidth(6), alignItems: 'center' }}>
+                <Text style={{ color: 'white', fontSize: responsiveFontSize(1.5), marginVertical: responsiveHeight(0.1) }}>{products.length}</Text>
+              </View>
+            )}
             <TouchableOpacity onPress={() => closeModal()}>
-              <Icon name='close' style={{ fontSize: 25 }} />
+              <Icon name='close' style={{ fontSize: responsiveFontSize(3.1) }} />
             </TouchableOpacity>
           </View>
         </View>
 
-        <TextInput
-          placeholder='Código del solicitante'
-          style={{ backgroundColor: 'rgb(220,220,220)', borderRadius: 100, paddingHorizontal: 10, marginBottom: 10 }}
+        {
+          empty && (
+            <Text style={{color:Colors.red, marginBottom:responsiveHeight(1)}}> Algún campo se encuentra vacío</Text>
+          )
+        }
+        <CustomInput
+          placeholder="Codigo de material"
           onChangeText={(text) => setCodeProduct(text)}
+          value={codeProduct}
+          keyboardType='numeric'
         />
-        <TextInput
-          placeholder='Descripción'
-          style={{ backgroundColor: 'rgb(220,220,220)', borderRadius: 100, paddingHorizontal: 10, marginBottom: 10 }}
+        <CustomInput
+          placeholder="Nombre de material"
+          onChangeText={(text) => setProductName(text)}
+          value={productname}
+        />
+        <CustomInput
+          placeholder="Descripción"
           onChangeText={(text) => setDescription(text)}
+          value={description}
         />
-        <TextInput
-          placeholder='No. piezas'
-          style={{ backgroundColor: 'rgb(220,220,220)', borderRadius: 100, paddingHorizontal: 10, marginBottom: 10 }}
+        <CustomInput
+          placeholder="No. piezas"
+          keyboardType='numeric'
           onChangeText={(text) => setNumPiece(text)}
+          value={numPiece}
         />
-        <TextInput
-          placeholder='Uso'
-          style={{ backgroundColor: 'rgb(220,220,220)', borderRadius: 100, paddingHorizontal: 10, marginBottom: 10 }}
+        <CustomInput
+          placeholder="Uso"
           onChangeText={(text) => setUso(text)}
+          value={uso}
         />
-        <TextInput
-          placeholder='Nombre del solicitante'
-          style={{ backgroundColor: 'rgb(220,220,220)', borderRadius: 100, paddingHorizontal: 10, marginBottom: 10 }}
+        <CustomInput
+          placeholder="Nombre solicitante"
           onChangeText={(text) => setName(text)}
+          value={name}
         />
 
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row', justifyContent:'space-between'}}>
           <TouchableOpacity
+            onPress={() => handleAddOther()}
             style={
               {
-                backgroundColor: Colors.primaryLite,
-                borderRadius: 100,
+                backgroundColor: Colors.doradoSeadust,
+                borderRadius: 10,
                 alignItems: 'center',
-                width: 120,
-                paddingVertical: 5,
-                marginVertical: 10,
-                marginRight: 30
+                width: responsiveWidth(30),
+                paddingVertical: responsiveHeight(0.5),
+                marginVertical: responsiveHeight(1),
               }
             }>
-            <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>
+            <Text style={{ color: 'white', fontSize: responsiveFontSize(2), fontFamily: 'myriadpro-bold' }}>
               Agregar otro
             </Text>
           </TouchableOpacity>
@@ -151,37 +291,29 @@ const ScreenPost = ({ visible, setVisible }) => {
           <TouchableOpacity
             style={
               {
-                backgroundColor: Colors.green,
-                borderRadius: 100,
+                backgroundColor: Colors.azulSeadust,
+                borderRadius: 10,
                 alignItems: 'center',
-                width: 120,
-                paddingVertical: 5,
-                marginVertical: 10,
+                width: responsiveWidth(30),
+                paddingVertical: responsiveHeight(0.5),
+                marginVertical: responsiveHeight(1),
               }
             }
             onPress={() => handleCreate()}
           >
-            <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>
+            <Text style={{ color: 'white', fontSize: responsiveFontSize(2), fontFamily: 'myriadpro-bold' }}>
               Generar
             </Text>
           </TouchableOpacity>
         </View>
 
-      {/* <Modal
-          transparent={true}
-          animationType='fade'
-          visible={isVisible}
-        >
-          <QRModal press={handle}/>
-        </Modal> */}
-
         <ModalLayout visible={isVisible}>
-          <View style={{alignItems:'center'}}>
-            <QRCode value={product} size={180}/>
+          <View style={{ alignItems: 'center' }}>
+            <QRCode value={product} size={180} logo={require('../assets/image/logoNew.png')} />
             <TouchableOpacity
               style={
                 {
-                  backgroundColor: Colors.green,
+                  backgroundColor: Colors.azulSeadust,
                   borderRadius: 100,
                   alignItems: 'center',
                   width: 120,
@@ -189,9 +321,9 @@ const ScreenPost = ({ visible, setVisible }) => {
                   marginVertical: 10,
                 }
               }
-              onPress={() => setisVisible(false)}
+              onPress={() => closeModal()}
             >
-              <Text style={{color:'white'}}>OK</Text>
+              <Text style={{ color: 'white', fontFamily: 'myriadpro-bold' }}>OK</Text>
             </TouchableOpacity>
           </View>
         </ModalLayout>
@@ -209,10 +341,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContainer: {
-    width: '80%',
+    width: responsiveWidth(80),
     backgroundColor: 'white',
-    paddingHorizontal: 20,
-    paddingVertical: 30,
+    paddingHorizontal: responsiveWidth(6),
+    paddingVertical: responsiveHeight(4),
     borderRadius: 20,
     elevation: 20,
   },
@@ -221,7 +353,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    marginBottom: 20
+    marginBottom: responsiveHeight(2)
   },
 });
 

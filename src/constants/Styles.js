@@ -1,5 +1,12 @@
 import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
+    containerHeader: {
+        flexDirection: 'row',
+        paddingVertical: 10,
+        paddingLeft: 15,
+        justifyContent:'space-between'
+    },
+
     container: {
         flexDirection: 'row',
         paddingVertical: 10,
@@ -13,7 +20,6 @@ const styles = StyleSheet.create({
     },
 
     icon: {
-        color: '#000',
         marginLeft:'auto',
         fontSize: 20,
         marginRight: 20

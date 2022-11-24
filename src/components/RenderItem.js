@@ -1,51 +1,209 @@
-import { useState } from 'react'
-import { View, Text, FlatList, TouchableOpacity, Switch } from 'react-native'
+import { useContext, useRef, useState } from 'react'
+import { View, Text, FlatList, TouchableOpacity, Switch, Animated, Alert, TextInput, } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 import Colors from '../constants/Colors'
 import styles from '../constants/Styles'
 import ModalLayout from './ModalLayout'
-const RenderItem = ({ item }) => {
+import Icon from 'react-native-vector-icons/FontAwesome';
+import firestore from '@react-native-firebase/firestore'
+import * as Animatable from 'react-native-animatable';
+import { AuthContext } from '../context/AuthProvider'
+import moment from 'moment'
+import 'moment/locale/es'
+import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
+import CustomInput from './CustomInput'
+const RenderItem = ({ item, sucess }) => {
 
     const [showContent, setShowContent] = useState(false)
     const [isVisible, setisVisible] = useState(false)
+    const [success, setSuccess] = useState(false)
+    const [enabled, setEnabled] = useState(false)
+    const [incomplete, setIncomplete] = useState(false)
+    const [piece, setPiece] = useState(0)
+
+    const { user } = useContext(AuthContext)
+
+    const animationController = useRef(new Animated.Value(0)).current;
+
+    const toogleListItem = () => {
+        const config = {
+            duration: 300,
+            toValue: showContent ? 0 : 1,
+            useNativeDriver: true
+        }
+
+        Animated.timing(animationController, config).start()
+        setShowContent(!showContent)
+    }
+
+    const arrowTransform = animationController.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '180deg']
+    })
+
+    const handleChange = (e) => {
+        setSuccess(!enabled)
+        setEnabled(!enabled)
+        // update(e)
+    }
+
+    const handlePiece = (text) => {
+        if (!text.trim() || text === "." ||  text === "-" || text === ",") {
+            setPiece("")
+        } else {
+            setPiece(parseInt(text))
+        }
+    }
+
+    const handleSum = () => {
+        if(piece === ""){
+            setPiece(0 + 1)
+        } else if (piece >= parseInt(item.numPiece)) {
+            setPiece(item.numPiece)
+        } else {
+            setPiece(piece + 1)
+        }
+    }
+    const handleRes = () => {
+        if(piece === "" || piece === 0){
+            setPiece(0)
+        } else {
+            setPiece(piece - 1)
+        }
+    }
+
+    const handleIncomplete = (item, piece) => {
+        if(piece === 0) {
+            update(item, "complete", 0)
+        } else {
+            update(item, "incomplete", piece)
+        }
+    }
+
+    const handleCancel = () => {
+        setSuccess(false)
+        setEnabled(false)
+    }
+
+    const update = (item, completed, missingPiece) => {
+        try {
+            firestore().collection(user.email).doc(item.id).update(
+                {
+                    ...item,
+                    success: true,
+                    completed,
+                    missingPiece
+                }
+            )
+        } catch (error) {
+            console.log(error)
+        }
+    }
     return (
-        <View style={{ backgroundColor: 'white', borderRadius: 15, marginTop: 5 }}>
-            <TouchableOpacity onPress={() => setShowContent(!showContent)}>
+        <View style={{ backgroundColor:"white", borderRadius: 15, marginBottom: 10, elevation: 5, marginLeft: 8, marginRight: 8 }}>
+            <View>
+                <View style={styles.containerHeader}>
+                    <View style={{ flexDirection: 'row' }}>
+                        <Text style={{ color: 'black', fontFamily: 'myriadpro-bold' }}>Folio: </Text>
+                        <Text style={{ color: 'black', fontFamily: 'myriadpro-light' }}>
+                            {item.folio}
+                        </Text>
+                        {
+                            item.success && (
+                                <Text style={{
+                                    color:`${item.completed === 'complete' ? '#1d8586' : '#f2a18b'}`,
+                                    fontSize: responsiveFontSize(2.5),
+                                    fontFamily: 'myriadpro-bold',
+                                    marginLeft: responsiveWidth(10)
+                                    }}>
+                                    {item.completed === 'complete' ? 'Completado' : 'Incompleto'}
+                                </Text>
+                            )
+                        }
+                    </View>
+
+                    <Animated.View style={{ transform: [{ rotateZ: arrowTransform }], marginRight: sucess ? 30 : 0 }}>
+                        <TouchableOpacity onPress={() => toogleListItem()}>
+                            <Icon name='chevron-up' style={{ color: Colors.azulSeadust, fontSize: responsiveFontSize(2.5) }} />
+                        </TouchableOpacity>
+                    </Animated.View>
+
+
+                    {!sucess && (
+                        <View style={{ marginRight: 10 }}>
+                            <Switch
+                                thumbColor={enabled ? Colors.azulSeadust : Colors.doradoSeadust}
+                                onValueChange={() => handleChange(item)}
+                                value={enabled}
+                            />
+                        </View>
+                    )}
+
+                </View>
+
+
                 <View style={styles.container}>
-                    <Text style={{ color: 'black', fontFamily: 'myriadpro-bold' }}>Folio: </Text>
+                    <Text style={{ color: 'black', fontFamily: 'myriadpro-bold' }}>Material: </Text>
                     <Text style={{ marginRight: 10, color: 'black', fontFamily: 'myriadpro-light' }}>
-                        {item.id}
+                        {item.productname}
                     </Text>
-                    <Switch/>
                 </View>
 
                 <View style={styles.container}>
-                    <Text style={{ color: 'black', fontFamily: 'myriadpro-bold' }}>Solicitante: </Text>
+                    <Text style={{ color: 'black', fontFamily: 'myriadpro-bold' }}>Piezas: </Text>
                     <Text style={{ marginRight: 10, color: 'black', fontFamily: 'myriadpro-light' }}>
-                        {item.name}
+                        {item.numPiece}
                     </Text>
                 </View>
 
-                <View style={styles.container}>
-                    <Text style={{ color: 'black', fontFamily: 'myriadpro-bold' }}>Fecha: </Text>
-                    <Text style={{ marginRight: 10, color: 'black', fontFamily: 'myriadpro-light' }}>
-                        {item.date}
-                    </Text>
+
+
+
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <View style={styles.container}>
+                        <Text style={{ color: 'black', fontFamily: 'myriadpro-bold' }}>Solicitante: </Text>
+                        <Text style={{ marginRight: 10, color: 'black', fontFamily: 'myriadpro-light' }}>
+                            {item.name}
+                        </Text>
+                    </View>
+
+                    <View style={styles.container}>
+                        <Text style={{ color: 'black', fontFamily: 'myriadpro-bold' }}>Fecha: </Text>
+                        <Text style={{ marginRight: 10, color: 'black', fontFamily: 'myriadpro-light' }}>
+                            {moment(item.date).calendar()}
+                        </Text>
+                    </View>
                 </View>
+
 
                 {showContent && (
-                    <View style={{ alignItems: 'flex-end', marginRight: 15, marginBottom: 15 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginRight: 15, marginBottom: 15 }}>
+                        <View style={styles.container}>
+                            <Text style={{ color: 'black', fontFamily: 'myriadpro-bold' }}>Descripción: </Text>
+                            <Text style={{ marginRight: 10, color: 'black', fontFamily: 'myriadpro-light' }}>
+                                {item.description}
+                            </Text>
+                        </View>
+                        {
+                            item.completed === 'incomplete' && (
+                                <TouchableOpacity
+                                    onPress={() => setIncomplete(true)}
+                                    style={{ backgroundColor: Colors.azulSeadust, borderRadius: 5, padding: 5, justifyContent:'center' }}>
+                                    <Text style={{color:'white'}}>Completar</Text>
+                                </TouchableOpacity>
+                            )
+                        }
                         <TouchableOpacity
                             onPress={() => setisVisible(true)}
-                            style={{ backgroundColor: Colors.doradoSeadust, borderRadius: 20, padding: 7 }}>
+                            style={{ backgroundColor: Colors.doradoSeadust, borderRadius: 5, padding: 5, justifyContent:'center' }}>
                             <Text style={{ color: 'black' }}>Ver QR</Text>
                         </TouchableOpacity>
                     </View>
                 )}
-            </TouchableOpacity>
+            </View>
             <ModalLayout visible={isVisible}>
                 <View style={{ alignItems: 'center' }}>
-                    <QRCode value={item.id} size={180} logo={require('../assets/image/logoAzul.png')}/>
+                    <QRCode value={item.id} size={180} logo={require('../assets/image/logoNew.png')} />
                     <TouchableOpacity
                         style={
                             {
@@ -60,6 +218,76 @@ const RenderItem = ({ item }) => {
                         onPress={() => setisVisible(false)}
                     >
                         <Text style={{ color: 'white' }}>OK</Text>
+                    </TouchableOpacity>
+                </View>
+            </ModalLayout>
+
+            <ModalLayout visible={success}>
+                <View>
+                    <Text style={{ textAlign: 'center', color: 'black', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(3) }}>
+                        Solicitud {item.productname}
+                    </Text>
+                    <Text style={{ textAlign: 'center', color: 'black', fontFamily: 'myriadpro-light', fontSize: responsiveFontSize(2) }}>
+                        ¿Se completó la solicitud?
+                    </Text>
+
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: responsiveHeight(1) }}>
+                        <TouchableOpacity
+                            style={{ backgroundColor: '#899199', borderRadius: 5, padding: responsiveWidth(2) }}
+                            onPress={() => handleCancel()}>
+                            <Text style={{ color: 'white', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(1.6) }}>Cancelar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={{ backgroundColor: Colors.doradoSeadust, borderRadius: 5, padding: responsiveWidth(2) }}
+                            onPress={() => setIncomplete(true)}
+                        >
+                            <Text style={{ color: 'white', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(1.6) }}>Incompleta</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={{ backgroundColor: Colors.azulSeadust, borderRadius: 5, padding: responsiveWidth(2) }}
+                            onPress={() => update(item, "complete", 0)}
+                        >
+                            <Text style={{ color: 'white', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(1.6) }}>Completa</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                </View>
+            </ModalLayout>
+
+            <ModalLayout visible={incomplete}>
+                <Text style={{ textAlign: 'center', color: 'black', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(2), marginBottom: responsiveHeight(2) }}>
+                    Ingresa las piezas faltantes
+                </Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginVertical: responsiveHeight(1) }}>
+                    <View style={{ justifyContent: 'center' }}>
+                        <CustomInput
+                            keyboardType='numeric'
+                            placeholder="No.Piezas"
+                            onChangeText={(text) => handlePiece(text)}
+                            value={ piece === "" ? "" : piece.toString()}
+                        />
+                    </View>
+                    <View>
+                        <TouchableOpacity onPress={() => handleSum()}>
+                            <Icon name='caret-up' style={{ color: Colors.azulSeadust, fontSize: responsiveFontSize(4.5) }} />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => handleRes()}>
+                            <Icon name='caret-down' style={{ color: Colors.azulSeadust, fontSize: responsiveFontSize(4.5) }} />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginVertical: responsiveHeight(1) }}>
+                    <TouchableOpacity
+                        style={{ backgroundColor: '#899199', borderRadius: 5, paddingHorizontal: responsiveWidth(5), paddingVertical: responsiveHeight(1) }}
+                        onPress={() => setIncomplete(false)}
+                    >
+                        <Text style={{ color: 'white', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(1.6) }}>Cancelar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={{ backgroundColor: Colors.azulSeadust, borderRadius: 5, paddingHorizontal: responsiveWidth(5), paddingVertical: responsiveHeight(1) }}
+                        onPress={() => handleIncomplete(item, piece)}
+                    >
+                        <Text style={{ color: 'white', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(1.6) }}>Confirmar</Text>
                     </TouchableOpacity>
                 </View>
             </ModalLayout>
