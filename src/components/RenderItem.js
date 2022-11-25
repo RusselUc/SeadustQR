@@ -20,6 +20,9 @@ const RenderItem = ({ item, sucess }) => {
     const [enabled, setEnabled] = useState(false)
     const [incomplete, setIncomplete] = useState(false)
     const [piece, setPiece] = useState(0)
+    const [isDelete, setIsDelete] = useState(false)
+
+    const [error, setError] = useState(false)
 
     const { user } = useContext(AuthContext)
 
@@ -48,41 +51,71 @@ const RenderItem = ({ item, sucess }) => {
     }
 
     const handlePiece = (text) => {
-        if (!text.trim() || text === "." ||  text === "-" || text === ",") {
+        if (!text.trim() || text === "." || text === "-" || text === ",") {
             setPiece("")
+        } else if (item.missingPiece) {
+            if (parseInt(text) > item.missingPiece) {
+                setPiece(item.missingPiece)
+                setError(true)
+            } else {
+                setPiece(parseInt(text))
+                setError(false)
+            }
+        } else if (parseInt(text) > parseInt(item.numPiece)) {
+            setPiece(parseInt(item.numPiece))
+            setError(true)
         } else {
             setPiece(parseInt(text))
+            setError(false)
         }
     }
 
     const handleSum = () => {
-        if(piece === ""){
+        if (piece === "") {
             setPiece(0 + 1)
+            setError(false)
+        } else if (item.missingPiece) {
+            if (piece >= item.missingPiece) {
+                setPiece(item.missingPiece)
+            } else {
+                setPiece(piece + 1)
+                setError(false)
+
+            }
         } else if (piece >= parseInt(item.numPiece)) {
             setPiece(item.numPiece)
         } else {
             setPiece(piece + 1)
+            setError(false)
         }
     }
     const handleRes = () => {
-        if(piece === "" || piece === 0){
+        if (piece === "" || piece === 0) {
             setPiece(0)
+            setError(false)
         } else {
             setPiece(piece - 1)
+            setError(false)
         }
     }
 
     const handleIncomplete = (item, piece) => {
-        if(piece === 0) {
+        if (piece === 0) {
             update(item, "complete", 0)
+            setIncomplete(false)
         } else {
             update(item, "incomplete", piece)
+            setIncomplete(false)
         }
     }
 
     const handleCancel = () => {
         setSuccess(false)
         setEnabled(false)
+    }
+
+    const handleDelete = (item) => {
+        firestore().collection(user.email).doc(item.id).delete()
     }
 
     const update = (item, completed, missingPiece) => {
@@ -100,7 +133,9 @@ const RenderItem = ({ item, sucess }) => {
         }
     }
     return (
-        <View style={{ backgroundColor:"white", borderRadius: 15, marginBottom: 10, elevation: 5, marginLeft: 8, marginRight: 8 }}>
+        <View
+            style={{ backgroundColor: "white", borderRadius: 15, marginBottom: 10, elevation: 5, marginLeft: 8, marginRight: 8 }}
+        >
             <View>
                 <View style={styles.containerHeader}>
                     <View style={{ flexDirection: 'row' }}>
@@ -111,11 +146,11 @@ const RenderItem = ({ item, sucess }) => {
                         {
                             item.success && (
                                 <Text style={{
-                                    color:`${item.completed === 'complete' ? '#1d8586' : '#f2a18b'}`,
+                                    color: `${item.completed === 'complete' ? '#1d8586' : '#f2a18b'}`,
                                     fontSize: responsiveFontSize(2.5),
                                     fontFamily: 'myriadpro-bold',
                                     marginLeft: responsiveWidth(10)
-                                    }}>
+                                }}>
                                     {item.completed === 'complete' ? 'Completado' : 'Incompleto'}
                                 </Text>
                             )
@@ -154,12 +189,22 @@ const RenderItem = ({ item, sucess }) => {
                     <Text style={{ marginRight: 10, color: 'black', fontFamily: 'myriadpro-light' }}>
                         {item.numPiece}
                     </Text>
+                    {
+                        item.success && (
+                            <>
+                                <Text style={{ color: 'black', fontFamily: 'myriadpro-bold' }}>Restantes: </Text>
+                                <Text style={{ marginRight: 10, color: 'black', fontFamily: 'myriadpro-light' }}>
+                                    {item.missingPiece}
+                                </Text>
+                            </>
+                        )
+                    }
                 </View>
 
 
 
 
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
                     <View style={styles.container}>
                         <Text style={{ color: 'black', fontFamily: 'myriadpro-bold' }}>Solicitante: </Text>
                         <Text style={{ marginRight: 10, color: 'black', fontFamily: 'myriadpro-light' }}>
@@ -177,27 +222,35 @@ const RenderItem = ({ item, sucess }) => {
 
 
                 {showContent && (
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginRight: 15, marginBottom: 15 }}>
+                    <View>
                         <View style={styles.container}>
                             <Text style={{ color: 'black', fontFamily: 'myriadpro-bold' }}>Descripción: </Text>
                             <Text style={{ marginRight: 10, color: 'black', fontFamily: 'myriadpro-light' }}>
                                 {item.description}
                             </Text>
                         </View>
-                        {
-                            item.completed === 'incomplete' && (
-                                <TouchableOpacity
-                                    onPress={() => setIncomplete(true)}
-                                    style={{ backgroundColor: Colors.azulSeadust, borderRadius: 5, padding: 5, justifyContent:'center' }}>
-                                    <Text style={{color:'white'}}>Completar</Text>
-                                </TouchableOpacity>
-                            )
-                        }
-                        <TouchableOpacity
-                            onPress={() => setisVisible(true)}
-                            style={{ backgroundColor: Colors.doradoSeadust, borderRadius: 5, padding: 5, justifyContent:'center' }}>
-                            <Text style={{ color: 'black' }}>Ver QR</Text>
-                        </TouchableOpacity>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginRight: '4%', marginLeft:'4%' ,marginBottom: 15 }}>
+                            {
+                                item.completed === 'incomplete' && (
+                                    <TouchableOpacity
+                                        onPress={() => setIncomplete(true)}
+                                        style={{ backgroundColor: Colors.azulSeadust, borderRadius: 5, padding: 5, justifyContent: 'center' }}>
+                                        <Text style={{ color: 'white' }}>Completar</Text>
+                                    </TouchableOpacity>
+                                )
+                            }
+                            <TouchableOpacity
+                                onPress={() => setisVisible(true)}
+                                style={{ backgroundColor: Colors.doradoSeadust, borderRadius: 5, padding: 5, justifyContent: 'center' }}>
+                                <Text style={{ color: 'black' }}>Ver QR</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                onPress={() => setIsDelete(true)}
+                                style={{ backgroundColor: Colors.red, borderRadius: 5, padding: 5, justifyContent: 'center' }}>
+                                <Icon name='trash-o' style={{color:'white', fontSize:responsiveFontSize(2.5)}}/>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 )}
             </View>
@@ -258,13 +311,18 @@ const RenderItem = ({ item, sucess }) => {
                 <Text style={{ textAlign: 'center', color: 'black', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(2), marginBottom: responsiveHeight(2) }}>
                     Ingresa las piezas faltantes
                 </Text>
+                {
+                    error && (
+                        <Text style={{ color: 'red', fontSize: responsiveFontSize(1.5) }}>Excede las piezas {item.missingPiece ? 'restantes ' : 'hechas '}en la solicitud</Text>
+                    )
+                }
                 <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginVertical: responsiveHeight(1) }}>
                     <View style={{ justifyContent: 'center' }}>
                         <CustomInput
                             keyboardType='numeric'
                             placeholder="No.Piezas"
                             onChangeText={(text) => handlePiece(text)}
-                            value={ piece === "" ? "" : piece.toString()}
+                            value={piece === "" ? "" : piece.toString()}
                         />
                     </View>
                     <View>
@@ -286,6 +344,29 @@ const RenderItem = ({ item, sucess }) => {
                     <TouchableOpacity
                         style={{ backgroundColor: Colors.azulSeadust, borderRadius: 5, paddingHorizontal: responsiveWidth(5), paddingVertical: responsiveHeight(1) }}
                         onPress={() => handleIncomplete(item, piece)}
+                    >
+                        <Text style={{ color: 'white', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(1.6) }}>Confirmar</Text>
+                    </TouchableOpacity>
+                </View>
+            </ModalLayout>
+            <ModalLayout visible={isDelete}>
+                <Text style={{ textAlign: 'center', color: 'black', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(2), marginBottom: responsiveHeight(2) }}>
+                    ¿Eliminar {item.productname}?
+                </Text>
+                <Text style={{ textAlign: 'center', color: 'black', fontFamily: 'myriadpro-light', fontSize: responsiveFontSize(2), marginBottom: responsiveHeight(2) }}>
+                    Una vez realizada la acción no se podrá deshacer
+                </Text>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginVertical: responsiveHeight(1) }}>
+                    <TouchableOpacity
+                        style={{ backgroundColor: '#899199', borderRadius: 5, paddingHorizontal: responsiveWidth(5), paddingVertical: responsiveHeight(1) }}
+                        onPress={() => setIsDelete(false)}
+                    >
+                        <Text style={{ color: 'white', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(1.6) }}>Cancelar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={{ backgroundColor: Colors.azulSeadust, borderRadius: 5, paddingHorizontal: responsiveWidth(5), paddingVertical: responsiveHeight(1) }}
+                        onPress={() => handleDelete(item)}
                     >
                         <Text style={{ color: 'white', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(1.6) }}>Confirmar</Text>
                     </TouchableOpacity>

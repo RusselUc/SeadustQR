@@ -45,11 +45,11 @@ export default function Home(props) {
             // .where("date", "<=", Date.now())
             // .orderBy("success", "desc")
             .onSnapshot(querySnapshot => {
+                setRequests(querySnapshot.size)
                 if(querySnapshot.size > 0){
                     setEmpty(false)
                 } else {
                     setEmpty(true)
-                    setRequests(querySnapshot.size)
                 }
             })
         return () => consulta()
