@@ -1,4 +1,4 @@
-import { View, Text, ImageBackground, Dimensions } from 'react-native'
+import { View, ImageBackground, Dimensions } from 'react-native'
 import React from 'react'
 
 export default function Background({ children }) {

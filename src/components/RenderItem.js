@@ -1,17 +1,18 @@
 import { useContext, useRef, useState } from 'react'
-import { View, Text, FlatList, TouchableOpacity, Switch, Animated, Alert, TextInput, } from 'react-native'
+import { View, Text, TouchableOpacity, Switch, Animated, } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 import Colors from '../constants/Colors'
 import styles from '../constants/Styles'
 import ModalLayout from './ModalLayout'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import firestore from '@react-native-firebase/firestore'
-import * as Animatable from 'react-native-animatable';
 import { AuthContext } from '../context/AuthProvider'
 import moment from 'moment'
 import 'moment/locale/es'
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 import CustomInput from './CustomInput'
+import QRModal from './QRModal'
+import ModalDelete from './ModalDelete'
 const RenderItem = ({ item, sucess }) => {
 
     const [showContent, setShowContent] = useState(false)
@@ -47,7 +48,6 @@ const RenderItem = ({ item, sucess }) => {
     const handleChange = (e) => {
         setSuccess(!enabled)
         setEnabled(!enabled)
-        // update(e)
     }
 
     const handlePiece = (text) => {
@@ -254,26 +254,7 @@ const RenderItem = ({ item, sucess }) => {
                     </View>
                 )}
             </View>
-            <ModalLayout visible={isVisible}>
-                <View style={{ alignItems: 'center' }}>
-                    <QRCode value={item.id} size={180} logo={require('../assets/image/logoNew.png')} />
-                    <TouchableOpacity
-                        style={
-                            {
-                                backgroundColor: Colors.azulSeadust,
-                                borderRadius: 100,
-                                alignItems: 'center',
-                                width: 120,
-                                paddingVertical: 5,
-                                marginVertical: 10,
-                            }
-                        }
-                        onPress={() => setisVisible(false)}
-                    >
-                        <Text style={{ color: 'white' }}>OK</Text>
-                    </TouchableOpacity>
-                </View>
-            </ModalLayout>
+            <QRModal isVisible={isVisible} qrString={item.folio.toString()} press={() => setisVisible(false)}/>
 
             <ModalLayout visible={success}>
                 <View>
@@ -349,29 +330,8 @@ const RenderItem = ({ item, sucess }) => {
                     </TouchableOpacity>
                 </View>
             </ModalLayout>
-            <ModalLayout visible={isDelete}>
-                <Text style={{ textAlign: 'center', color: 'black', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(2), marginBottom: responsiveHeight(2) }}>
-                    ¿Eliminar {item.productname}?
-                </Text>
-                <Text style={{ textAlign: 'center', color: 'black', fontFamily: 'myriadpro-light', fontSize: responsiveFontSize(2), marginBottom: responsiveHeight(2) }}>
-                    Una vez realizada la acción no se podrá deshacer
-                </Text>
 
-                <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginVertical: responsiveHeight(1) }}>
-                    <TouchableOpacity
-                        style={{ backgroundColor: '#899199', borderRadius: 5, paddingHorizontal: responsiveWidth(5), paddingVertical: responsiveHeight(1) }}
-                        onPress={() => setIsDelete(false)}
-                    >
-                        <Text style={{ color: 'white', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(1.6) }}>Cancelar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={{ backgroundColor: Colors.azulSeadust, borderRadius: 5, paddingHorizontal: responsiveWidth(5), paddingVertical: responsiveHeight(1) }}
-                        onPress={() => handleDelete(item)}
-                    >
-                        <Text style={{ color: 'white', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(1.6) }}>Confirmar</Text>
-                    </TouchableOpacity>
-                </View>
-            </ModalLayout>
+            <ModalDelete isDelete={isDelete} productname={item.productname} setIsDelete={()=> setIsDelete(false)} handleDelete={()=>handleDelete(item)}/>
         </View>
     )
 }

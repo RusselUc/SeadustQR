@@ -1,22 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   StyleSheet,
-  Button,
   Modal,
-  Image,
-  Text,
-  TouchableOpacity,
   Animated,
-  TextInput,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { useNavigation } from '@react-navigation/native';
-import Colors from '../constants/Colors';
-
-import firestore from '@react-native-firebase/firestore'
-import QRCode from 'react-native-qrcode-svg';
-import QRModal from '../components/QRModal';
 
 const ModalLayout = ({ visible, children }) => {
     const [showModal, setShowModal] = React.useState(visible);

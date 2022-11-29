@@ -1,38 +1,33 @@
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native'
+import { View, Text, TouchableOpacity, } from 'react-native'
 import React from 'react'
 import QRCode from 'react-native-qrcode-svg'
-import Button from './Button'
 import Colors from '../constants/Colors'
+import ModalLayout from './ModalLayout'
 
-const WIDTH = Dimensions.get('window').width
-const HEIGHT = 150
-
-export default function QRModal({qrString, press}) {
+const QRModal = ({isVisible, qrString, press}) => {
   return (
-    <TouchableOpacity
-        disabled={true}
-        style={styles.container}
-    >
-
-        <View style={styles.modal}>
-            <QRCode value={qrString}/>
-            <Button btnLabel="OK" bgColor={Colors.primaryAlpha} onPress={press} />
-        </View>
-    </TouchableOpacity>
+    <ModalLayout visible={isVisible}>
+          <View style={{ alignItems: 'center' }}>
+            <QRCode value={qrString} size={180} logo={require('../assets/image/logoNew.png')} />
+            <TouchableOpacity
+              style={
+                {
+                  backgroundColor: Colors.azulSeadust,
+                  borderRadius: 100,
+                  alignItems: 'center',
+                  width: 120,
+                  paddingVertical: 5,
+                  marginVertical: 10,
+                }
+              }
+              onPress={press}
+            >
+              <Text style={{ color: 'white', fontFamily: 'myriadpro-bold' }}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </ModalLayout>
   )
 }
 
-const styles = StyleSheet.create({
-    container:{
-        flex:1,
-        alignItems:'center',
-        justifyContent:'center'
-    },
-    modal:{
-        height:HEIGHT,
-        width:WIDTH-80,
-        paddingTop:10,
-        backgroundColor:'white',
-        borderRadius:10
-    }
-})
+
+export default QRModal

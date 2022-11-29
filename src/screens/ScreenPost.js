@@ -1,64 +1,22 @@
 import React, { useState, useContext, useEffect } from 'react';
 import {
   View,
-  StyleSheet,
-  Button,
-  Modal,
-  Image,
   Text,
   TouchableOpacity,
-  Animated,
-  TextInput,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import Colors from '../constants/Colors';
 
 import firestore from '@react-native-firebase/firestore'
-import QRCode from 'react-native-qrcode-svg';
 import QRModal from '../components/QRModal';
-import ModalLayout from '../components/ModalLayout';
 import { AuthContext } from '../context/AuthProvider';
 import CustomInput from '../components/CustomInput';
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
+import ModalPoup from '../components/ModalPoup';
+import styles from '../constants/Styles';
+import ButtonModal from '../components/ButtonModal';
 
-
-
-const ModalPoup = ({ visible, children }) => {
-  const [showModal, setShowModal] = React.useState(visible);
-  const scaleValue = React.useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    toggleModal();
-  }, [visible]);
-  const toggleModal = () => {
-    if (visible) {
-      setShowModal(true);
-      Animated.spring(scaleValue, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    } else {
-      setTimeout(() => setShowModal(false), 200);
-      Animated.timing(scaleValue, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    }
-  };
-  return (
-    <Modal transparent visible={showModal}>
-      <View style={styles.modalBackGround}>
-        <Animated.View
-          style={[styles.modalContainer, { transform: [{ scale: scaleValue }] }]}>
-          {children}
-        </Animated.View>
-      </View>
-    </Modal>
-  );
-};
 
 const ScreenPost = ({ visible, setVisible }) => {
 
@@ -79,18 +37,11 @@ const ScreenPost = ({ visible, setVisible }) => {
 
   const [products, setProducts] = useState([])
 
-  const [focus, setFocus] = useState(Colors.azulSeadust)
-
   const navigation = useNavigation();
-
 
   const closeModal = () => {
     navigation.navigate('ScreenList')
-    setCodeProduct("")
-    setDescription("")
-    setNumPiece("")
-    setUso("")
-    setProductName("")
+    cleanInputs()
     setProducts([])
     setFlag(false)
     setVisible(false)
@@ -118,19 +69,7 @@ const ScreenPost = ({ visible, setVisible }) => {
 
   const handleCreate = async () => {
     try {
-      if (!codeProduct.trim()) {
-        console.log("vacio code product")
-        setEmpty(true)
-      } else if (!description.trim()) {
-        console.log("vacio description")
-        setEmpty(true)
-      } else if (!numPiece.trim()) {
-        console.log("vacio numPiece")
-        setEmpty(true)
-      } else if (!uso.trim()) {
-        console.log("vacio uso")
-        setEmpty(true)
-      } else {
+      if (!emptyInput()) {
         setEmpty(false)
         products.push({
           codeProduct,
@@ -171,23 +110,7 @@ const ScreenPost = ({ visible, setVisible }) => {
   }
 
   const handleAddOther = () => {
-    if (!codeProduct.trim()) {
-      console.log("vacio code product")
-      setEmpty(true)
-    } else if(!productname.trim()){
-      setEmpty(true)
-    } else if (!description.trim()) {
-      console.log("vacio description")
-      setEmpty(true)
-    } else if (!numPiece.trim()) {
-      console.log("vacio numPiece")
-      setEmpty(true)
-    } else if (!uso.trim()) {
-      console.log("vacio uso")
-      setEmpty(true)
-    } else if(!name.trim()){
-      setEmpty(true)
-    } else {
+    if(!emptyInput()) {
       setEmpty(false)
       setFlag(true)
       setProducts([...products, {
@@ -202,12 +125,39 @@ const ScreenPost = ({ visible, setVisible }) => {
         date: Date.now(),
         success: false
       }])
-      setCodeProduct("")
-      setDescription("")
-      setNumPiece("")
-      setUso("")
-      setProductName("")
+      cleanInputs()
     }
+  }
+
+  const emptyInput = () => {
+    if (!codeProduct.trim()) {
+      setEmpty(true)
+      return true
+    } else if(!productname.trim()){
+      setEmpty(true)
+      return true
+    } else if (!description.trim()) {
+      setEmpty(true)
+      return true
+    } else if (!numPiece.trim()) {
+      setEmpty(true)
+      return true
+    } else if (!uso.trim()) {
+      setEmpty(true)
+      return true
+    } else if(!name.trim()){
+      setEmpty(true)
+      return true
+    }
+  }
+
+  const cleanInputs = () => {
+    setCodeProduct("")
+    setDescription("")
+    setNumPiece("")
+    setUso("")
+    setProductName("")
+    setName("")
   }
 
   useEffect(() => {
@@ -271,90 +221,17 @@ const ScreenPost = ({ visible, setVisible }) => {
         />
 
         <View style={{ flexDirection: 'row', justifyContent:'space-between'}}>
-          <TouchableOpacity
-            onPress={() => handleAddOther()}
-            style={
-              {
-                backgroundColor: Colors.doradoSeadust,
-                borderRadius: 10,
-                alignItems: 'center',
-                width: responsiveWidth(30),
-                paddingVertical: responsiveHeight(0.5),
-                marginVertical: responsiveHeight(1),
-              }
-            }>
-            <Text style={{ color: 'white', fontSize: responsiveFontSize(2), fontFamily: 'myriadpro-bold' }}>
-              Agregar otro
-            </Text>
-          </TouchableOpacity>
 
-          <TouchableOpacity
-            style={
-              {
-                backgroundColor: Colors.azulSeadust,
-                borderRadius: 10,
-                alignItems: 'center',
-                width: responsiveWidth(30),
-                paddingVertical: responsiveHeight(0.5),
-                marginVertical: responsiveHeight(1),
-              }
-            }
-            onPress={() => handleCreate()}
-          >
-            <Text style={{ color: 'white', fontSize: responsiveFontSize(2), fontFamily: 'myriadpro-bold' }}>
-              Generar
-            </Text>
-          </TouchableOpacity>
+          <ButtonModal press={() => handleAddOther()} color={Colors.doradoSeadust} text="Agregar Otro"/>
+          <ButtonModal press={() => handleCreate()} color={Colors.azulSeadust} text="Generar"/>
+
         </View>
-
-        <ModalLayout visible={isVisible}>
-          <View style={{ alignItems: 'center' }}>
-            <QRCode value={product} size={180} logo={require('../assets/image/logoNew.png')} />
-            <TouchableOpacity
-              style={
-                {
-                  backgroundColor: Colors.azulSeadust,
-                  borderRadius: 100,
-                  alignItems: 'center',
-                  width: 120,
-                  paddingVertical: 5,
-                  marginVertical: 10,
-                }
-              }
-              onPress={() => closeModal()}
-            >
-              <Text style={{ color: 'white', fontFamily: 'myriadpro-bold' }}>OK</Text>
-            </TouchableOpacity>
-          </View>
-        </ModalLayout>
+        <QRModal isVisible={isVisible} qrString={product} press={ () => closeModal()}/>
       </ModalPoup>
 
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  modalBackGround: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContainer: {
-    width: responsiveWidth(80),
-    backgroundColor: 'white',
-    paddingHorizontal: responsiveWidth(6),
-    paddingVertical: responsiveHeight(4),
-    borderRadius: 20,
-    elevation: 20,
-  },
-  header: {
-    flexDirection: 'row',
-    width: '100%',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    marginBottom: responsiveHeight(2)
-  },
-});
 
 export default ScreenPost;

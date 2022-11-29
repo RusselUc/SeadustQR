@@ -1,18 +1,14 @@
-import { View, Text, Dimensions, Image, StatusBar, TouchableOpacity } from 'react-native'
+import { View, Text, Dimensions, Image, } from 'react-native'
 import React, {useContext} from 'react'
 import Background from '../components/Background'
-import Button from '../components/Button'
-import Colors from '../constants/Colors'
-import { GoogleSignin, GoogleSigninButton } from '@react-native-google-signin/google-signin';
-import auth from '@react-native-firebase/auth';
+import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
 import { AuthContext } from '../context/AuthProvider'
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 
 
 
 export default function ScreenLog(props) {
-  const { height, width } = Dimensions.get('window')
-  const {googleSignIn, googleSignOut, getCurrentUser, isSignedIn} = useContext(AuthContext)
+  const {googleSignIn } = useContext(AuthContext)
 
   const toHome = async () =>{
     await googleSignIn()

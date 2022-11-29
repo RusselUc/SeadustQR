@@ -1,15 +1,16 @@
-import { View, Text, SafeAreaView, StatusBar, Image, TouchableOpacity, FlatList, Dimensions } from 'react-native'
+import { View, Text, StatusBar, Image, TouchableOpacity, FlatList, Dimensions } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import Colors from '../constants/Colors'
 import firestore from '@react-native-firebase/firestore'
 import { AuthContext } from '../context/AuthProvider'
 import RenderItem from '../components/RenderItem'
-import { responsiveFontSize, responsiveHeight, responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth, responsiveWidth } from 'react-native-responsive-dimensions'
+import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions'
+import styles from '../constants/Styles'
 
 
 export default function Home(props) {
 
-    const { height, width } = Dimensions.get('window')
+    const { height } = Dimensions.get('window')
 
     const [requests, setRequests] = useState(0)
     const [delivered, setDelivered] = useState(0)
@@ -21,12 +22,11 @@ export default function Home(props) {
     const loadDataRequest = () => {
         firestore().collection(user.email)
             .orderBy("date", "desc")
-            // .limit(2)
             .onSnapshot(querySnapshot => {
                 const products = []
                 querySnapshot.forEach(document => {
-                    if(!document.data().success) {
-                        if(products.length < 2){
+                    if (!document.data().success) {
+                        if (products.length < 2) {
                             products.push({
                                 ...document.data(),
                                 id: document.id
@@ -42,11 +42,9 @@ export default function Home(props) {
     const loadRequest = async () => {
         const consulta = firestore().collection(user.email)
             .where("success", "==", false)
-            // .where("date", "<=", Date.now())
-            // .orderBy("success", "desc")
             .onSnapshot(querySnapshot => {
                 setRequests(querySnapshot.size)
-                if(querySnapshot.size > 0){
+                if (querySnapshot.size > 0) {
                     setEmpty(false)
                 } else {
                     setEmpty(true)
@@ -72,7 +70,7 @@ export default function Home(props) {
 
 
     return (
-        <View style={{ backgroundColor: 'white', height: '100%', }}>
+        <View style={{ height: '100%', }}>
 
             <StatusBar
                 backgroundColor={Colors.azulSeadust}
@@ -92,16 +90,16 @@ export default function Home(props) {
 
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                 <TouchableOpacity onPress={() => props.navigation.navigate('ScreenList')}>
-                    <View style={{ marginLeft: '10%', backgroundColor: Colors.azulSeadust, height: responsiveHeight(18), width: responsiveWidth(38), borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={{ fontSize: responsiveScreenFontSize(2.5), fontFamily: 'myriadpro-bold', color: 'white', }}>Solicitudes</Text>
-                        <Text style={{ fontSize: responsiveScreenFontSize(6), fontFamily: 'myriadpro-light', color: 'white', textAlign: 'center', }}>{requests}</Text>
+                    <View style={[styles.textRequest, { marginLeft: '10%', backgroundColor: Colors.azulSeadust }]}>
+                        <Text style={[styles.title, { color: 'white', }]}>Solicitudes</Text>
+                        <Text style={[styles.textBody, { color: 'white',}]}>{requests}</Text>
                     </View>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => props.navigation.navigate('ScreenSuccess')}>
-                    <View style={{ marginRight: '5%', backgroundColor: Colors.doradoSeadust, height: responsiveHeight(18), width: responsiveWidth(38), borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={{ fontSize: responsiveScreenFontSize(2.5), fontFamily: 'myriadpro-bold', color: 'black', }}>Entregados</Text>
-                        <Text style={{ fontSize: responsiveScreenFontSize(6), fontFamily: 'myriadpro-light', color: 'black', textAlign: 'center' }}>{delivered}</Text>
+                    <View style={[styles.textRequest, { marginRight: '5%', backgroundColor: Colors.doradoSeadust}]}>
+                        <Text style={[styles.title,{color: 'black', }]}>Entregados</Text>
+                        <Text style={[styles.textBody, {color:'black'}] }>{delivered}</Text>
                     </View>
                 </TouchableOpacity>
             </View>
@@ -128,10 +126,6 @@ export default function Home(props) {
                     </View>
                 )
             }
-
-
-
-
         </View>
     )
 }
