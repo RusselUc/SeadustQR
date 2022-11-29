@@ -1,9 +1,9 @@
-import { View, Text, FlatList, Dimensions, Image, SafeAreaView } from 'react-native'
+import { View, Text, FlatList, Dimensions, } from 'react-native'
 import React, { useEffect, useState, useContext } from 'react'
 import firestore from '@react-native-firebase/firestore'
 import RenderItem from '../components/RenderItem'
 import { AuthContext } from '../context/AuthProvider'
-import Colors from '../constants/Colors'
+import EmptyItems from '../components/EmptyItems'
 
 export default function ScreenList() {
 
@@ -36,27 +36,11 @@ export default function ScreenList() {
   }
 
   useEffect(() => {
-    // loadData()
     load()
   }, [])
 
   return empty ? (
-    <SafeAreaView style={{ backgroundColor: '#F5F5F5', height: '100%' }}>
-      <View style={{ padding: 10 }}>
-        <View style={{ alignItems: 'center', paddingVertical: 10, }}>
-          <Text style={{ fontSize: 30, fontFamily: 'myriadpro-bold', color: 'black' }}>Solicitudes</Text>
-        </View>
-      </View>
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{marginBottom:40, fontFamily:'myriadpro-bold', color:'black', fontSize:20}}>Aún no hay solicitudes</Text>
-        <View style={{backgroundColor:Colors.azulSeadust, borderRadius:150}}>
-          <Image
-            source={require('../assets/image/notFound.gif')}
-            style={{ height: 300, width: 300 }}
-          />
-        </View>
-      </View>
-    </SafeAreaView>
+    <EmptyItems text="Aún no hay solicitudes" title="Solicitudes"/>
   ) : (
     <View style={{ padding: 10, height: height - 60 }}>
       <View style={{ alignItems: 'center', paddingVertical: 10, }}>

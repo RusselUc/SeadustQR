@@ -9,8 +9,6 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { useEffect, useRef, useState } from "react"
 import * as Animatable from 'react-native-animatable';
 import Colors from "../constants/Colors";
-import ModalPoup from "./ModalPoup"
-import { event } from "react-native-reanimated"
 
 
 
@@ -114,11 +112,7 @@ export default function Tabs() {
 
         listeners={({navigation}) => ({
           tabPress: event => {
-            // event.preventDefault()
-            // navigation.navigate('Home')
             setVisible(true)
-            // console.log("clic");
-            // navigation.navigate('LayoutHome')
           }
         })}
       />

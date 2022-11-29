@@ -1,18 +1,17 @@
 import { useContext, useRef, useState } from 'react'
 import { View, Text, TouchableOpacity, Switch, Animated, } from 'react-native'
-import QRCode from 'react-native-qrcode-svg'
 import Colors from '../constants/Colors'
 import styles from '../constants/Styles'
-import ModalLayout from './ModalLayout'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import firestore from '@react-native-firebase/firestore'
 import { AuthContext } from '../context/AuthProvider'
 import moment from 'moment'
 import 'moment/locale/es'
-import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
-import CustomInput from './CustomInput'
+import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions'
 import QRModal from './QRModal'
 import ModalDelete from './ModalDelete'
+import ModalIncomplete from './ModalIncomplete'
+import ModalSwitch from './ModalSwitch'
 const RenderItem = ({ item, sucess }) => {
 
     const [showContent, setShowContent] = useState(false)
@@ -254,82 +253,25 @@ const RenderItem = ({ item, sucess }) => {
                     </View>
                 )}
             </View>
+
             <QRModal isVisible={isVisible} qrString={item.folio.toString()} press={() => setisVisible(false)}/>
 
-            <ModalLayout visible={success}>
-                <View>
-                    <Text style={{ textAlign: 'center', color: 'black', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(3) }}>
-                        Solicitud {item.productname}
-                    </Text>
-                    <Text style={{ textAlign: 'center', color: 'black', fontFamily: 'myriadpro-light', fontSize: responsiveFontSize(2) }}>
-                        ¿Se completó la solicitud?
-                    </Text>
+            <ModalSwitch visible={success}
+                item={item}
+                handleCancel={() => handleCancel()}
+                setIncomplete={() => setIncomplete(true)}
+                handleUpdate={() => update(item, "complete", 0)}/>
 
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: responsiveHeight(1) }}>
-                        <TouchableOpacity
-                            style={{ backgroundColor: '#899199', borderRadius: 5, padding: responsiveWidth(2) }}
-                            onPress={() => handleCancel()}>
-                            <Text style={{ color: 'white', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(1.6) }}>Cancelar</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={{ backgroundColor: Colors.doradoSeadust, borderRadius: 5, padding: responsiveWidth(2) }}
-                            onPress={() => setIncomplete(true)}
-                        >
-                            <Text style={{ color: 'white', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(1.6) }}>Incompleta</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={{ backgroundColor: Colors.azulSeadust, borderRadius: 5, padding: responsiveWidth(2) }}
-                            onPress={() => update(item, "complete", 0)}
-                        >
-                            <Text style={{ color: 'white', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(1.6) }}>Completa</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                </View>
-            </ModalLayout>
-
-            <ModalLayout visible={incomplete}>
-                <Text style={{ textAlign: 'center', color: 'black', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(2), marginBottom: responsiveHeight(2) }}>
-                    Ingresa las piezas faltantes
-                </Text>
-                {
-                    error && (
-                        <Text style={{ color: 'red', fontSize: responsiveFontSize(1.5) }}>Excede las piezas {item.missingPiece ? 'restantes ' : 'hechas '}en la solicitud</Text>
-                    )
-                }
-                <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginVertical: responsiveHeight(1) }}>
-                    <View style={{ justifyContent: 'center' }}>
-                        <CustomInput
-                            keyboardType='numeric'
-                            placeholder="No.Piezas"
-                            onChangeText={(text) => handlePiece(text)}
-                            value={piece === "" ? "" : piece.toString()}
-                        />
-                    </View>
-                    <View>
-                        <TouchableOpacity onPress={() => handleSum()}>
-                            <Icon name='caret-up' style={{ color: Colors.azulSeadust, fontSize: responsiveFontSize(4.5) }} />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => handleRes()}>
-                            <Icon name='caret-down' style={{ color: Colors.azulSeadust, fontSize: responsiveFontSize(4.5) }} />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginVertical: responsiveHeight(1) }}>
-                    <TouchableOpacity
-                        style={{ backgroundColor: '#899199', borderRadius: 5, paddingHorizontal: responsiveWidth(5), paddingVertical: responsiveHeight(1) }}
-                        onPress={() => setIncomplete(false)}
-                    >
-                        <Text style={{ color: 'white', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(1.6) }}>Cancelar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={{ backgroundColor: Colors.azulSeadust, borderRadius: 5, paddingHorizontal: responsiveWidth(5), paddingVertical: responsiveHeight(1) }}
-                        onPress={() => handleIncomplete(item, piece)}
-                    >
-                        <Text style={{ color: 'white', fontFamily: 'myriadpro-bold', fontSize: responsiveFontSize(1.6) }}>Confirmar</Text>
-                    </TouchableOpacity>
-                </View>
-            </ModalLayout>
+            <ModalIncomplete visible={incomplete}
+                item={item} error={error}
+                handlePiece={(text) => handlePiece(text)}
+                piece={piece}
+                erro={error}
+                handleSum={() => handleSum()}
+                handleRes={() => handleRes()}
+                setIncomplete={() => setIncomplete(false)}
+                handleIncomplete={() => handleIncomplete(item, piece)}
+                />
 
             <ModalDelete isDelete={isDelete} productname={item.productname} setIsDelete={()=> setIsDelete(false)} handleDelete={()=>handleDelete(item)}/>
         </View>
